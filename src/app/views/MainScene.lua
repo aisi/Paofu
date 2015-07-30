@@ -7,6 +7,8 @@ local MainScene = class("MainScene", cc.load("mvc").ViewBase)
 MainScene.RESOURCE_FILENAME = "MainScene.csb"
 
 function MainScene:onCreate()
+	display.loadSpriteFrames("eliminateGameRes.plist","eliminateGameRes.png",nil)
+
 	self.bgView = display.newSprite("gameBg.png")
 	self.bgView:setAnchorPoint(0,0)
 	self.bgView:addTo(self)

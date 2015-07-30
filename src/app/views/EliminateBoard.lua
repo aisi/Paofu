@@ -19,7 +19,7 @@ function EliminateBoard:initData()
 end
 
 function EliminateBoard:initView()
-	self.bgView = display.newSprite("gameBoardBg.png")
+	self.bgView = display.newSprite("#gameBoardBg.png")
 	local size = self.bgView:getContentSize()
 	self.bgView:setPosition(size.width*0.5,size.height*0.5)
 	self.bgView:addTo(self)

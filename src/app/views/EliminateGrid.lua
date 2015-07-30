@@ -17,9 +17,9 @@ end
 
 function EliminateGrid:initBgView()
 	if (self.coloum+self.row)%2==0 then
-		self.bgView = display.newSprite("tilebg0.png")
+		self.bgView = display.newSprite("#tilebg0.png")
 	else
-		self.bgView = display.newSprite("tilebg1.png")
+		self.bgView = display.newSprite("#tilebg1.png")
 	end
 	local bgViewSize = self.bgView:getContentSize()
 	self.bgView:setPosition(cc.exports.ITEM_WIDTH*0.5,cc.exports.ITEM_HEIGHT*0.5):addTo(self)
