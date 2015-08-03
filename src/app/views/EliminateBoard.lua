@@ -3,6 +3,7 @@
 -- Date: 2015-07-30 16:02:02
 --
 import(".EliminateMarcos")
+import(".EliminateUtil")
 local EliminateGrid = import(".EliminateGrid")
 local EliminateBoard = class("EliminateBoard",function (  )
 	local node = display.newNode()
@@ -25,12 +26,16 @@ function EliminateBoard:initView()
 	self.bgView:addTo(self)
 	self:setContentSize(size)
 
-	for i=1,cc.exports.BOARD_ROW do
-		for j =1,cc.exports.BOARD_COLOUM do
+	self.lowerLayer = display.newLayer():addTo(self)
+	self.itemLayer = display.newLayer():addTo(self)
+	self.upperLayer = display.newLayer():addTo(self)
+
+	for i=1,cc.exports.EliminateMarcos.BOARD_ROW do
+		for j =1,cc.exports.EliminateMarcos.BOARD_COLOUM do
 			local grid = EliminateGrid.new(j,i)
-			grid:setPosition((i-1)*cc.exports.ITEM_WIDTH+cc.exports.PADDING_X,
-				(cc.exports.BOARD_ROW-j)*cc.exports.ITEM_HEIGHT+cc.exports.PADDING_Y)
-			self:addChild(grid)
+			grid:setPosition(cc.exports.EliminateUtil:grid2Pos(j,i))
+			print(cc.exports.EliminateUtil:pos2Grid(grid:getPosition()))
+			self.lowerLayer:addChild(grid)
 			self.grids[i..j] = grid
 		end
 	end

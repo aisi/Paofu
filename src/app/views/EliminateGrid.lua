@@ -22,15 +22,7 @@ function EliminateGrid:initBgView()
 		self.bgView = display.newSprite("#tilebg1.png")
 	end
 	local bgViewSize = self.bgView:getContentSize()
-	self.bgView:setPosition(cc.exports.ITEM_WIDTH*0.5,cc.exports.ITEM_HEIGHT*0.5):addTo(self)
-	--math.randomseed(os.time())
-
-	local itemId = math.random(1,6)
-	local itemPic = "#"..20100+itemId..".png"
-	print(itemPic)
-	self.sp = display.newSprite(itemPic)
-	self.sp:setPosition(self.bgView:getPosition()):addTo(self)
-
+	self.bgView:setPosition(cc.exports.EliminateMarcos.ITEM_WIDTH*0.5,cc.exports.EliminateMarcos.ITEM_HEIGHT*0.5):addTo(self)
 end
 
 return EliminateGrid
