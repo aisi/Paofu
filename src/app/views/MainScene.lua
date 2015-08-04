@@ -1,6 +1,5 @@
-local EliminateBoard = require("app.views.EliminateBoard")
 
-
+local EliminateBoard = require("app.Eliminate.EliminateBoard")
 
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
 

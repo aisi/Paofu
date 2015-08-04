@@ -6,21 +6,24 @@ cc.exports.EliminateUtil = cc.exports.EliminateUtil or {}
 
 function EliminateUtil:grid2Pos(coloum,row)	
 
-	return (coloum-1)*cc.exports.EliminateMarcos.ITEM_WIDTH+cc.exports.EliminateMarcos.PADDING_X,
-		   (cc.exports.EliminateMarcos.BOARD_ROW-row)*cc.exports.EliminateMarcos.ITEM_HEIGHT+cc.exports.EliminateMarcos.PADDING_Y
+	return (coloum)*cc.exports.EliminateMarcos.ITEM_WIDTH
+			+cc.exports.EliminateMarcos.PADDING_X
+			+cc.exports.EliminateMarcos.ITEM_WIDTH*0.5,
+		   (cc.exports.EliminateMarcos.BOARD_ROW-1-row)*cc.exports.EliminateMarcos.ITEM_HEIGHT
+		   +cc.exports.EliminateMarcos.PADDING_Y+cc.exports.EliminateMarcos.ITEM_HEIGHT*0.5
 				
 end
 
 function EliminateUtil:pos2Grid(x,y)
 	local tmpX = x - cc.exports.EliminateMarcos.PADDING_X
-	local gridX = math.ceil(tmpX/cc.exports.EliminateMarcos.ITEM_WIDTH)+1
+	local gridX = math.floor(tmpX/cc.exports.EliminateMarcos.ITEM_WIDTH)
 	local tmpY = y-cc.exports.EliminateMarcos.PADDING_Y
-	local gridY = cc.exports.EliminateMarcos.BOARD_ROW-math.ceil(tmpY/cc.exports.EliminateMarcos.ITEM_HEIGHT)
+	local gridY = cc.exports.EliminateMarcos.BOARD_ROW-math.floor(tmpY/cc.exports.EliminateMarcos.ITEM_HEIGHT)
 	return gridX,gridY
 end
 
 function EliminateUtil:index2GridPos(index)
-	local tmpRow = math.ceil(index/cc.exports.EliminateMarcos.BOARD_ROW)
+	local tmpRow = math.floor(index/cc.exports.EliminateMarcos.BOARD_ROW)
 	local tmpColoum = index - tmpRow*cc.exports.EliminateMarcos.BOARD_ROW
 	return tmpColoum,tmpRow
 end
