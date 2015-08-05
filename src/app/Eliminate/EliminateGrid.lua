@@ -12,10 +12,11 @@ end)
 
 function EliminateGrid:ctor(coloum,row)
 	self.itemList = {}
+	self.cube = nil
 	self.coloum = coloum
 	self.row = row
-
 	self.bgIndex = 0
+
 	self:initBgView()
 end
 
@@ -28,9 +29,18 @@ function EliminateGrid:initBgView()
 	self.bgView:setPosition(U:grid2Pos(self.coloum,self.row))
 end
 
+function EliminateGrid:addCube(cube)
+	self.cube = cube
+end
+
 function EliminateGrid:addItem(item)
 	self.itemList[#self.itemList+1] = item
-	self.colorType = item.colorType
+end
+
+function EliminateGrid:onEliminate()
+	if self.cube ~= nil then
+		self.cube:onEliminate()
+	end
 end
 
 return EliminateGrid

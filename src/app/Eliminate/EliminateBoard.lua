@@ -6,11 +6,13 @@
 require "app/Eliminate/EliminateMarcos"
 require "app/Eliminate/EliminateUtil"
 
+local scheduler = require("framework.scheduler")
 local M = cc.exports.EliminateMarcos
 local U = cc.exports.EliminateUtil
 
 local EliminateGrid = import(".EliminateGrid")
 local EliminateItem = import(".EliminateItem")
+local EliminateCheckAction = import(".Actions.EliminateCheckAction")
 
 local EliminateBoard = class("EliminateBoard",function (  )
 	local node = display.newNode()
@@ -23,11 +25,7 @@ function EliminateBoard:ctor()
 	self:initBackground()
 	self:initGrids()
 	self:initItems()
-	performWithDelay(self,function()
-		print("-------------")
-		print(" delay call")
-		print("-------------")
-	end, 5.0)
+	self:initActions()
 end
 
 function EliminateBoard:restart()
@@ -66,7 +64,22 @@ function EliminateBoard:initItems()
 		local item = EliminateItem.new(value)
 		item:setGridPos(U:index2GridPos(index))
 		item:addToView(self.itemLayer)
-		self.grids[index]:addItem(item)
+		self.grids[index]:addCube(item)
 	end
+end
+
+function EliminateBoard:initActions()
+	self.checkEliminateAction = EliminateCheckAction.new(self)
+	scheduler.performWithDelayGlobal(function()
+		self:delayCall()
+	end, 2.0)
+end
+function EliminateBoard:delayCall( ... )
+	print("-------------")
+		for k,v in pairs(self.grids) do
+			print(k,tostring(v),v.row)
+		end
+		self.checkEliminateAction:checkEliminate(self.grids)
+	print("-------------")
 end
 return EliminateBoard
