@@ -71,15 +71,8 @@ end
 function EliminateBoard:initActions()
 	self.checkEliminateAction = EliminateCheckAction.new(self)
 	scheduler.performWithDelayGlobal(function()
-		self:delayCall()
-	end, 2.0)
-end
-function EliminateBoard:delayCall( ... )
-	print("-------------")
-		for k,v in pairs(self.grids) do
-			print(k,tostring(v),v.row)
-		end
-		self.checkEliminateAction:checkEliminate(self.grids)
-	print("-------------")
+		self.checkEliminateAction:doStep()
+		self.checkEliminateAction:doStep()
+	end,2.0)	
 end
 return EliminateBoard

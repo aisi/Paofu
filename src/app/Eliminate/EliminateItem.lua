@@ -26,6 +26,9 @@ function EliminateItem:addToView(target)
 end
 
 function EliminateItem:onEliminate()
-	transition.fadeOut(self.view, {time=1})
+	self.locked = true
+	self.view:stopAllActions ()
+	local seq = cc.RepeatForever:create(cc.Blink:create(1.0, 1))
+	self.view:runAction(seq)
 end
 return EliminateItem

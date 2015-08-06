@@ -5,10 +5,7 @@
 --import(".EliminateMarcos")
 local U = cc.exports.EliminateUtil
 
-local EliminateGrid = class(EliminateGrid, function()
-	local node = display.newNode()
-	return node
-end)
+local EliminateGrid = class("EliminateGrid")
 
 function EliminateGrid:ctor(coloum,row)
 	self.itemList = {}

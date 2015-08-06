@@ -31,3 +31,12 @@ end
 function EliminateUtil:gridPos2Index(coloum,row)
 	return row*cc.exports.EliminateMarcos.BOARD_ROW+coloum
 end
+
+function EliminateUtil:itemInArr(t,value)
+	for k,v in pairs(t) do
+		if v==value then
+			return true
+		end
+	end
+	return false
+end
