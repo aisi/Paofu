@@ -5,10 +5,12 @@
 
 require "app/Eliminate/EliminateMarcos"
 require "app/Eliminate/EliminateUtil"
+require "app/Eliminate/EliminateGlobal"
 
 local scheduler = require("framework.scheduler")
 local M = cc.exports.EliminateMarcos
 local U = cc.exports.EliminateUtil
+local G = cc.exports.EliminateGlobal
 
 local EliminateGrid = import(".EliminateGrid")
 local EliminateItem = import(".EliminateItem")
@@ -26,6 +28,8 @@ function EliminateBoard:ctor()
 	self:initGrids()
 	self:initItems()
 	self:initActions()
+
+	G.EliminateContext = self
 end
 
 function EliminateBoard:restart()
@@ -62,7 +66,8 @@ function EliminateBoard:initItems()
 	local mapData = M.testData
 	for index,value in pairs(mapData) do
 		local item = EliminateItem.new(value)
-		item:setGridPos(U:index2GridPos(index))
+		local coloum,row = U:index2GridPos(index)
+		item:setGridPos(coloum,row)
 		item:addToView(self.itemLayer)
 		self.grids[index]:addCube(item)
 	end
@@ -70,9 +75,8 @@ end
 
 function EliminateBoard:initActions()
 	self.checkEliminateAction = EliminateCheckAction.new(self)
-	scheduler.performWithDelayGlobal(function()
+	self:scheduleUpdateWithPriorityLua(function()
 		self.checkEliminateAction:doStep()
-		self.checkEliminateAction:doStep()
-	end,2.0)	
+	end,2)	
 end
 return EliminateBoard

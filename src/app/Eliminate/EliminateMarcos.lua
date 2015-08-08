@@ -15,6 +15,10 @@ cc.exports.EliminateMarcos.PADDING_Y = 3
 
 cc.exports.EliminateMarcos.testData = {}
 
+cc.exports.EliminateMarcos.UNKOWN = -1
+
+cc.exports.EliminateMarcos.DROP_UNIT_ACC = 10
+
 for i=0,63 do
 	local v = math.random(20101,20106)
 	cc.exports.EliminateMarcos.testData[i] = v

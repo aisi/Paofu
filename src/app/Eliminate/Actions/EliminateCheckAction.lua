@@ -12,11 +12,9 @@ end
 
 function EliminateCheckAction:onEnter()
 	print("-----------------")
-	self.eliminateGrids = {}
-	tip = {}
-end
-function EliminateCheckAction:onExit()
 	
+end
+function EliminateCheckAction:onExit()	
 	local str = ""
 	for k,v in pairs(tip) do
 		str = str.." "..v
@@ -25,16 +23,19 @@ function EliminateCheckAction:onExit()
 			str=""
 		end
 	end
-	self.tip = nil
-	self.eliminateGrids = nil
 	print("-----------------")
 end
 
 
 function EliminateCheckAction:doStep()
-	self:onEnter()
+	--self:onEnter()
+	self.tip = {}
+	self.eliminateGrids = {}
 	self:checkBoard(self.context.grids)
-	self:onExit()
+	self:checkDropDown(self.context.grids)
+	self.eliminateGrids = nil
+	self.tip = nil
+	--self:onExit()
 end
 
 function EliminateCheckAction:checkSwap(grid0,grid1)
@@ -57,7 +58,9 @@ end
 function EliminateCheckAction:checkEliminatePerGrid(boardData,coloum,row)
 	local contactGrids = {}
 	local grid = boardData[U:gridPos2Index(coloum, row)]	
-
+	if grid.cube ==nil then
+		return
+	end
 	self:findContactGrids(boardData,coloum, row, contactGrids,grid.cube.colorType)
 	tip[#tip+1] = (table.nums(contactGrids))
 	local maxRowCount = 0
@@ -172,6 +175,24 @@ function EliminateCheckAction:rowChain(boardData,grid)
 	end
 
 	return chainList
+end
+
+function EliminateCheckAction:checkDropDown(boardData)
+
+	for coloum = 0,M.BOARD_COLOUM-1 do
+		local distance = 0
+		for row = M.BOARD_ROW-1, 0 ,-1 do
+			local grid = boardData[U:gridPos2Index(coloum, row)]
+			if grid.cube == nil then
+				distance = distance + 1 
+			else
+				if distance > 0 then
+					print(coloum,row,distance)
+					grid:fallDownContent(coloum, distance+row)
+				end
+			end	
+		end
+	end
 end
 
 return EliminateCheckAction

@@ -4,6 +4,7 @@
 --
 --import(".EliminateMarcos")
 local U = cc.exports.EliminateUtil
+local G = cc.exports.EliminateGlobal
 
 local EliminateGrid = class("EliminateGrid")
 
@@ -39,5 +40,10 @@ function EliminateGrid:onEliminate()
 		self.cube:onEliminate()
 	end
 end
-
+function EliminateGrid:fallDownContent(targetColoum,targetRow)
+	local targetGrid = G.EliminateContext.grids[U:gridPos2Index(targetColoum, targetRow)]
+	if self.cube:gotoGrid(targetGrid) then
+	   self.cube = nil
+	end
+end
 return EliminateGrid
