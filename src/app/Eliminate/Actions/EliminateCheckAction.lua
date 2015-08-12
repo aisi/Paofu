@@ -8,6 +8,7 @@ local EliminateCheckAction = class("EliminateCheckAction")
 local tip = {}
 function EliminateCheckAction:ctor(actionContext)
 	self.context = actionContext
+	self.slidDrop = {}
 end
 
 function EliminateCheckAction:onEnter()
@@ -101,10 +102,10 @@ function EliminateCheckAction:findContactGrids(boardData,coloum,row,contactGrids
 	if U:itemInArr(contactGrids, grid) then
 		return
 	end
-	if grid==nil or grid.cube==nil or grid.cube.locked or grid.cube.colorType ~= colorType then
+
+	if grid==nil or grid.cube==nil or not grid.cube:canEliminate() or grid.cube.colorType ~= colorType then
 		return
 	end
-
 	table.insert(contactGrids, grid)
 
 	self:findContactGrids(boardData,coloum-1,row,contactGrids,colorType)
@@ -124,7 +125,7 @@ function EliminateCheckAction:coloumChain(boardData,grid)
 		and nextGrid~=nil 
 		and nextGrid.cube~=nil
 		and nextGrid.cube.colorType==grid.cube.colorType 
-		and not nextGrid.cube.locked do
+		and nextGrid.cube:canEliminate() do
 		table.insert(chainList,nextGrid)
 		nextCol = nextCol+1
 		nextGrid = boardData[U:gridPos2Index(nextCol,nextRow)]
@@ -136,7 +137,7 @@ function EliminateCheckAction:coloumChain(boardData,grid)
 		and nextGrid~=nil 
 		and nextGrid.cube~=nil 
 		and nextGrid.cube.colorType == grid.cube.colorType
-		and not nextGrid.cube.locked do
+		and nextGrid.cube:canEliminate() do
 		table.insert(chainList,nextGrid)
 		nextCol= nextCol - 1
 		nextGrid = boardData[U:gridPos2Index(nextCol,nextRow)]
@@ -156,7 +157,7 @@ function EliminateCheckAction:rowChain(boardData,grid)
 		and nextGrid~=nil 
 		and nextGrid.cube~=nil 
 		and nextGrid.cube.colorType==grid.cube.colorType
-		and not nextGrid.cube.locked do
+		and nextGrid.cube:canEliminate() do
 		table.insert(chainList,nextGrid)
 		nextRow = nextRow + 1
 		nextGrid = boardData[U:gridPos2Index(nextCol,nextRow)]
@@ -168,7 +169,7 @@ function EliminateCheckAction:rowChain(boardData,grid)
 		and nextGrid~=nil 
 		and nextGrid.cube~=nil
 		and nextGrid.cube.colorType == grid.cube.colorType 
-		and not nextGrid.cube.locked do
+		and nextGrid.cube:canEliminate() do
 		table.insert(chainList,nextGrid)
 		nextRow = nextRow - 1
 		nextGrid = boardData[U:gridPos2Index(nextCol,nextRow)]
@@ -179,20 +180,78 @@ end
 
 function EliminateCheckAction:checkDropDown(boardData)
 
-	for coloum = 0,M.BOARD_COLOUM-1 do
-		local distance = 0
-		for row = M.BOARD_ROW-1, 0 ,-1 do
-			local grid = boardData[U:gridPos2Index(coloum, row)]
-			if grid.cube == nil then
-				distance = distance + 1 
-			else
-				if distance > 0 then
-					print(coloum,row,distance)
-					grid:fallDownContent(coloum, distance+row)
+	for row = M.BOARD_ROW-1,0,-1 do
+		for coloum = 0,M.BOARD_COLOUM-1 do
+			local curGrid = boardData[U:gridPos2Index(coloum, row)]
+			local findFallDown = false
+			if curGrid.cube == nil then
+
+				for index=row-1,0,-1 do
+					local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
+					--当前不能纵向搜索终止
+					if tmpGrid.cube ~= nil and tmpGrid.cube:canDrop() then
+						--print(row.." "..coloum.."==>"..index.." "..coloum.."  "..tostring(tmpGrid.cube))
+						tmpGrid:fallDownContent(coloum,row)
+						findFallDown = true
+						break						
+					end
 				end
-			end	
+
+				if not findFallDown then
+					for index= 0,row do
+						local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
+						if tmpGrid~=nil and tmpGrid.cube==nil then
+							local fallDownGrid = self:checkSlide(tmpGrid,boardData)
+							if fallDownGrid ~=nil and self:checkCanSlide(tmpGrid,boardData) then
+								print(fallDownGrid.row.." "..fallDownGrid.coloum.."==>"..index.." "..coloum.."  "..tostring(fallDownGrid.cube))
+								fallDownGrid:fallDownContent(coloum, index)
+								break
+							end
+						end	
+					end
+				end
+
+			end
+
 		end
 	end
+end
+
+function EliminateCheckAction:checkSlide(grid,boardData)
+	
+	local randomDir = math.random(0,1)
+	if randomDir==0 then
+		randomDir =-1
+	end
+	local fallDownGrid = boardData[U:gridPos2Index(grid.coloum-randomDir, grid.row-1)]
+	if fallDownGrid~=nil and fallDownGrid.cube~=nil and fallDownGrid.cube:canDrop() then
+		--print(grid.coloum-randomDir.."#  #"..grid.row-1)
+		return fallDownGrid
+	end
+	local fallDownGrid = boardData[U:gridPos2Index(grid.coloum+randomDir, grid.row-1)]
+	if fallDownGrid~=nil and fallDownGrid.cube~=nil and fallDownGrid.cube:canDrop() then
+		--print(grid.coloum+randomDir.."#  #"..grid.row-1)
+		return fallDownGrid
+	end
+
+	return nil
+end
+
+function EliminateCheckAction:checkCanSlide(grid,boardData)
+	local coloum = grid.coloum
+	local row = grid.row
+	local x,y = U:grid2Pos(coloum, row)
+	for index= 0,M.BOARD_ROW-1 do
+		local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
+		if tmpGrid~=nil and tmpGrid.cube~=nil then
+
+			if tmpGrid.cube.view:getPositionY() > y-M.ITEM_HEIGHT*0.2 then
+				return false
+			end
+		end
+	end
+
+	return true
 end
 
 return EliminateCheckAction

@@ -29,6 +29,13 @@ function EliminateUtil:index2GridPos(index)
 end
 
 function EliminateUtil:gridPos2Index(coloum,row)
+	--print(coloum.."  "..row)
+	if coloum >=cc.exports.EliminateMarcos.BOARD_COLOUM 
+		or coloum<0 
+		or  row >=cc.exports.EliminateMarcos.BOARD_ROW 
+		or row <0 then
+		return -1
+	end
 	return row*cc.exports.EliminateMarcos.BOARD_ROW+coloum
 end
 

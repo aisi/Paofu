@@ -17,6 +17,10 @@ function EliminateItem:initWithItemId(itemId)
 	self.itemId = itemId
 	self.colorType = itemId-20100
 	self.locked = false
+	self.droping = false
+	self.eliminating = false
+	self.targetGridRow = -1
+	self.targetGridColoum = -1
 end
 
 function EliminateItem:setGridPos(coloum,row)
@@ -30,7 +34,7 @@ function EliminateItem:addToView(target)
 end
 
 function EliminateItem:onEliminate()
-	self.locked = true
+	self.eliminating = true
 	self.view:stopAllActions()
 	local seq = cc.Sequence:create(
 		cc.ScaleTo:create(0.2,0.0),
@@ -44,22 +48,40 @@ end
 
 function EliminateItem:gotoGrid(grid)
 	local disY =  grid.row - self.row
+	local disX = grid.coloum - self.coloum
+
 	self.coloum = grid.coloum
 	self.row = grid.row
 	grid.cube  = self
-	print(disY)
-	self.locked = true
-
-	local seq = cc.Sequence:create(
+	self.droping = true
+	if disX~=0 then
+		local seq = cc.Sequence:create(
+		cc.MoveTo:create(0.2, cc.p(U:grid2Pos(grid.coloum,  grid.row))),
+		cc.CallFunc:create(function()
+			self.droping = false
+		end)
+		)
+		self.view:runAction(seq)
+	else
+		local seq = cc.Sequence:create(
 		cc.EaseIn:create(cc.MoveTo:create(math.sqrt(disY/M.DROP_UNIT_ACC), cc.p(U:grid2Pos(grid.coloum,  grid.row))),2),
 		cc.CallFunc:create(function()
-			self.locked = false
+			self.droping = false
 		end),
 		cc.MoveBy:create(0.05, cc.p(0,5)),
 		cc.MoveBy:create(0.05, cc.p(0,-5))
 		)
-	self.view:runAction(seq)
-
+		self.view:runAction(seq)
+	end
 	return true
 end
+
+function EliminateItem:canEliminate()
+	return not (self.droping or self.eliminating)	
+end
+
+function EliminateItem:canDrop()
+	return not (self.droping or self.eliminating)
+end
+
 return EliminateItem
