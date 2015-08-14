@@ -18,7 +18,7 @@ function EliminateUtil:pos2Grid(x,y)
 	local tmpX = x - cc.exports.EliminateMarcos.PADDING_X
 	local gridX = math.floor(tmpX/cc.exports.EliminateMarcos.ITEM_WIDTH)
 	local tmpY = y-cc.exports.EliminateMarcos.PADDING_Y
-	local gridY = cc.exports.EliminateMarcos.BOARD_ROW-math.floor(tmpY/cc.exports.EliminateMarcos.ITEM_HEIGHT)
+	local gridY = cc.exports.EliminateMarcos.BOARD_ROW-math.floor(tmpY/cc.exports.EliminateMarcos.ITEM_HEIGHT)-1
 	return gridX,gridY
 end
 

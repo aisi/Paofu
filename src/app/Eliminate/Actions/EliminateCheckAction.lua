@@ -4,11 +4,12 @@
 --
 local M = cc.exports.EliminateMarcos
 local U = cc.exports.EliminateUtil
+local G = cc.exports.EliminateGlobal
+
 local EliminateCheckAction = class("EliminateCheckAction")
 local tip = {}
 function EliminateCheckAction:ctor(actionContext)
 	self.context = actionContext
-	self.slidDrop = {}
 end
 
 function EliminateCheckAction:onEnter()
@@ -34,8 +35,10 @@ function EliminateCheckAction:doStep()
 	self.eliminateGrids = {}
 	self:checkBoard(self.context.grids)
 	self:checkDropDown(self.context.grids)
+	self.context.swepOperation:setStable(self:checkStable(self.context.grids))
 	self.eliminateGrids = nil
 	self.tip = nil
+
 	--self:onExit()
 end
 
@@ -44,7 +47,6 @@ function EliminateCheckAction:checkSwap(grid0,grid1)
 end
 
 function EliminateCheckAction:checkBoard(boardData)
-	local eliminateGrids
 	for row = 0,M.BOARD_ROW-1 do
 		for coloum = 0,M.BOARD_COLOUM-1 do
 			self:checkEliminatePerGrid(boardData,coloum,row)
@@ -186,7 +188,7 @@ function EliminateCheckAction:checkDropDown(boardData)
 			local findFallDown = false
 			if curGrid.cube == nil then
 
-				for index=row-1,0,-1 do
+				for index=row,0,-1 do
 					local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
 					--当前不能纵向搜索终止
 					if tmpGrid.cube ~= nil and tmpGrid.cube:canDrop() then
@@ -194,6 +196,16 @@ function EliminateCheckAction:checkDropDown(boardData)
 						tmpGrid:fallDownContent(coloum,row)
 						findFallDown = true
 						break						
+					elseif tmpGrid.cube~=nil and (tmpGrid.cube.droping or tmpGrid.cube.eliminating) then
+						findFallDown = true
+						break
+					elseif tmpGrid.cube==nil and tmpGrid.isEntrance then
+						local item = tmpGrid:createItem()
+						local num = self:checkNeedWaitNum(tmpGrid,boardData)
+						item:setGridPos(tmpGrid.coloum,-num)
+						item:addToView(G.EliminateContext.itemLayer)
+						item:gotoGrid(curGrid)
+						findFallDown = true
 					end
 				end
 
@@ -203,7 +215,7 @@ function EliminateCheckAction:checkDropDown(boardData)
 						if tmpGrid~=nil and tmpGrid.cube==nil then
 							local fallDownGrid = self:checkSlide(tmpGrid,boardData)
 							if fallDownGrid ~=nil and self:checkCanSlide(tmpGrid,boardData) then
-								print(fallDownGrid.row.." "..fallDownGrid.coloum.."==>"..index.." "..coloum.."  "..tostring(fallDownGrid.cube))
+								--print(fallDownGrid.row.." "..fallDownGrid.coloum.."==>"..index.." "..coloum.."  "..tostring(fallDownGrid.cube))
 								fallDownGrid:fallDownContent(coloum, index)
 								break
 							end
@@ -245,7 +257,7 @@ function EliminateCheckAction:checkCanSlide(grid,boardData)
 		local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
 		if tmpGrid~=nil and tmpGrid.cube~=nil then
 
-			if tmpGrid.cube.view:getPositionY() > y-M.ITEM_HEIGHT*0.2 then
+			if tmpGrid.cube.view:getPositionY() > y then
 				return false
 			end
 		end
@@ -254,5 +266,35 @@ function EliminateCheckAction:checkCanSlide(grid,boardData)
 	return true
 end
 
+
+function EliminateCheckAction:checkNeedWaitNum(grid,boardData)
+	local waitCount = 1
+	local coloum = grid.coloum
+	local row = grid.row
+	local x,y = U:grid2Pos(coloum, row)
+	for index= 0,M.BOARD_ROW-1 do
+		local tmpGrid = boardData[U:gridPos2Index(coloum, index)]
+		if tmpGrid~=nil and tmpGrid.cube~=nil and tmpGrid.cube.droping then
+			if tmpGrid.cube.view:getPositionY() > M.PADDING_Y*2+M.BOARD_ROW*M.ITEM_HEIGHT then
+				waitCount = waitCount + 1 
+			end
+		end
+	end
+
+	return waitCount
+end
+
+
+function EliminateCheckAction:checkStable(boardData)
+	for row = M.BOARD_ROW-1,0,-1 do
+		for coloum = 0,M.BOARD_COLOUM-1 do
+			local curGrid = boardData[U:gridPos2Index(coloum, row)]
+			if curGrid~=nil and curGrid.cube~=nil and (curGrid.cube.eliminating or curGrid.cube.droping) then
+				return false
+			end
+		end
+	end
+	return true
+end
 return EliminateCheckAction
 

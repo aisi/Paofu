@@ -7,7 +7,7 @@ require "app/Eliminate/EliminateMarcos"
 require "app/Eliminate/EliminateUtil"
 require "app/Eliminate/EliminateGlobal"
 
-local scheduler = require("framework.scheduler")
+--local scheduler = require("framework.scheduler")
 local M = cc.exports.EliminateMarcos
 local U = cc.exports.EliminateUtil
 local G = cc.exports.EliminateGlobal
@@ -15,6 +15,7 @@ local G = cc.exports.EliminateGlobal
 local EliminateGrid = import(".EliminateGrid")
 local EliminateItem = import(".EliminateItem")
 local EliminateCheckAction = import(".Actions.EliminateCheckAction")
+local SwepOperation = import(".Operations.SwepOperation")
 
 local EliminateBoard = class("EliminateBoard",function (  )
 	local node = display.newNode()
@@ -43,13 +44,25 @@ end
 function EliminateBoard:initBackground()
 	self.bgView = display.newSprite("#gameBoardBg.png")
 	local size = self.bgView:getContentSize()
+
+	local rect  = self.bgView:getBoundingBox()
+	rect.width = size.width
+	rect.height =size.height
+	rect.x=0
+	rect.y=0
+	local clip = cc.ClippingRectangleNode:create(rect)
+	--clip:setClippingRegion(rect)
+	
+
 	self.bgView:setPosition(size.width*0.5,size.height*0.5)
 	self.bgView:addTo(self)
 	self:setContentSize(size)
+	clip:addTo(self)
 
-	self.lowerLayer = display.newLayer():addTo(self)
-	self.itemLayer = display.newLayer():addTo(self)
-	self.upperLayer = display.newLayer():addTo(self)
+	self.lowerLayer = display.newLayer():addTo(clip)
+	self.itemLayer = display.newLayer():addTo(clip)
+	self.upperLayer = display.newLayer():addTo(clip)
+	self.touchLayer = display.newLayer():addTo(clip)
 end
 
 function EliminateBoard:initGrids()
@@ -60,6 +73,11 @@ function EliminateBoard:initGrids()
 			self.grids[U:gridPos2Index(j,i)] = grid
 		end
 	end
+	for i=0,2 do
+		self.grids[i].isEntrance = true
+	end
+	
+
 end
 
 function EliminateBoard:initItems()
@@ -77,6 +95,10 @@ function EliminateBoard:initActions()
 	self.checkEliminateAction = EliminateCheckAction.new(self)
 	self:scheduleUpdateWithPriorityLua(function()
 		self.checkEliminateAction:doStep()
+		collectgarbage("collect")
+   		print("memory3:", collectgarbage("count"))
 	end,2)	
+	self.swepOperation = SwepOperation.new(self) 
+
 end
 return EliminateBoard

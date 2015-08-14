@@ -49,27 +49,37 @@ end
 function EliminateItem:gotoGrid(grid)
 	local disY =  grid.row - self.row
 	local disX = grid.coloum - self.coloum
-
+	local orgY = self.row
+	print("ORGY "..self.row.." ORGX "..self.coloum)
 	self.coloum = grid.coloum
 	self.row = grid.row
 	grid.cube  = self
 	self.droping = true
 	if disX~=0 then
 		local seq = cc.Sequence:create(
-		cc.MoveTo:create(0.2, cc.p(U:grid2Pos(grid.coloum,  grid.row))),
+		cc.MoveTo:create(0.22, cc.p(U:grid2Pos(grid.coloum,  grid.row))),
 		cc.CallFunc:create(function()
 			self.droping = false
 		end)
 		)
 		self.view:runAction(seq)
+	-- elseif orgY == -1 then
+	-- 	print("orgY")
+	-- 	local seq = cc.Sequence:create(
+	-- 	cc.MoveTo:create(0.25, cc.p(U:grid2Pos(grid.coloum,  grid.row))),
+	-- 	cc.CallFunc:create(function()
+	-- 		self.droping = false
+	-- 	end)
+	-- 	)
+	-- 	self.view:runAction(seq)
 	else
 		local seq = cc.Sequence:create(
-		cc.EaseIn:create(cc.MoveTo:create(math.sqrt(disY/M.DROP_UNIT_ACC), cc.p(U:grid2Pos(grid.coloum,  grid.row))),2),
+		cc.EaseIn:create(cc.MoveTo:create(math.sqrt(disY/M.DROP_UNIT_ACC), cc.p(U:grid2Pos(grid.coloum,  grid.row))),1.8),
 		cc.CallFunc:create(function()
 			self.droping = false
 		end),
-		cc.MoveBy:create(0.05, cc.p(0,5)),
-		cc.MoveBy:create(0.05, cc.p(0,-5))
+		cc.MoveBy:create(0.05, cc.p(0,-4)),
+		cc.MoveBy:create(0.05, cc.p(0,4))
 		)
 		self.view:runAction(seq)
 	end
@@ -81,6 +91,10 @@ function EliminateItem:canEliminate()
 end
 
 function EliminateItem:canDrop()
+	return not (self.droping or self.eliminating)
+end
+
+function EliminateItem:canMove()
 	return not (self.droping or self.eliminating)
 end
 

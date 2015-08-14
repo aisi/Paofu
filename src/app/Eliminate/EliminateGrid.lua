@@ -7,6 +7,7 @@ local U = cc.exports.EliminateUtil
 local G = cc.exports.EliminateGlobal
 
 local EliminateGrid = class("EliminateGrid")
+local EliminateItem = import(".EliminateItem")
 
 function EliminateGrid:ctor(coloum,row)
 	self.itemList = {}
@@ -14,8 +15,13 @@ function EliminateGrid:ctor(coloum,row)
 	self.coloum = coloum
 	self.row = row
 	self.bgIndex = 0
-
+	self.isEntrance = false
 	self:initBgView()
+end
+
+
+function EliminateGrid:addEntrance()
+	self.isEntrance = true
 end
 
 function EliminateGrid:initBgView()
@@ -46,4 +52,14 @@ function EliminateGrid:fallDownContent(targetColoum,targetRow)
 	   self.cube = nil
 	end
 end
+
+function EliminateGrid:createItem()
+	if self.isEntrance then
+		local v = math.random(20101,20106)
+		local item = EliminateItem.new(v)
+		return  item
+	end
+	return nil
+end
+
 return EliminateGrid

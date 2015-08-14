@@ -25,5 +25,11 @@ for i=0,63 do
 end
 
 for i=0,7 do
-	cc.exports.EliminateMarcos.testData[i*8] = 20101
+	cc.exports.EliminateMarcos.testData[i*8+4] = 20101
 end
+	-- cc.exports.EliminateMarcos.testData[9] = 20102
+	-- cc.exports.EliminateMarcos.testData[49] = 20102
+	-- cc.exports.EliminateMarcos.testData[50] = 20102
+	-- cc.exports.EliminateMarcos.testData[1] = 20102
+	-- cc.exports.EliminateMarcos.testData[57] = 20102
+	-- cc.exports.EliminateMarcos.testData[58] = 20102
