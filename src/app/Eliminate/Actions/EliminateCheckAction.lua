@@ -65,7 +65,7 @@ function EliminateCheckAction:checkEliminatePerGrid(boardData,coloum,row)
 		return
 	end
 	self:findContactGrids(boardData,coloum, row, contactGrids,grid.cube.colorType)
-	tip[#tip+1] = (table.nums(contactGrids))
+	--tip[#tip+1] = (table.nums(contactGrids))
 	local maxRowCount = 0
 	local maxColoumCount = 0
 	for k,v in pairs(contactGrids) do	
